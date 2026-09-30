@@ -155,7 +155,7 @@ background: linear-gradient(135deg, #0B1F3A 0%, #12355B 18%, #1E5F8C 34%, #1B8A9
 
 ### Accessibility
 
-- **Color Contrast (WCAG AA):** Minimum 4.5:1 for body text and 3:1 for large text and UI components. Gradient backgrounds always use White text on the navy/blue range only, never on Fresh Mint or Recovery Gold.
+- **Color Contrast (WCAG AA):** Minimum 4.5:1 for body text and 3:1 for large text and UI components. Body-size White text sits only on the Midnight Navy to Ledger Blue range of the gradient (6.8:1 or higher). Insight Teal allows White text at large sizes only (4.1:1), and Growth Emerald, Fresh Mint, and Recovery Gold take Dark Blue text.
 - **Keyboard Navigation:** All interactive elements are reachable and operable by keyboard, in a logical tab order, with skip-to-content links.
 - **Screen Reader Support (ARIA):** Semantic HTML landmarks, ARIA labels on icon-only buttons, `aria-live` regions for dynamic metrics, and text alternatives or data tables for every chart.
 - **Visible Focus Indicators:** A 2px Insight Teal focus ring with 2px offset on every focusable element. Never removed.
