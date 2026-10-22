@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useDemoModal } from '../hooks/useDemoModal'
 import { track } from '../lib/analytics'
 import { Button } from './shared/Button'
@@ -9,9 +10,11 @@ const KEY = 'aiq-exit-shown'
 export function ExitIntent({ suppressed }) {
   const ref = useRef(null)
   const { open } = useDemoModal()
+  const { pathname } = useLocation()
+  const onHome = pathname === '/'
 
   useEffect(() => {
-    if (!window.matchMedia('(pointer: fine)').matches) return
+    if (!onHome || !window.matchMedia('(pointer: fine)').matches) return
     const onLeave = (e) => {
       if (e.clientY > 0 || e.relatedTarget || suppressed) return
       try {
@@ -29,7 +32,7 @@ export function ExitIntent({ suppressed }) {
       clearTimeout(timer)
       document.removeEventListener('mouseout', onLeave)
     }
-  }, [suppressed])
+  }, [suppressed, onHome])
 
   return (
     <dialog ref={ref} className="modal" aria-labelledby="exit-title">

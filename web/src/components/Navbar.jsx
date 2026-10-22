@@ -1,12 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bars3Icon, XMarkIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline'
 import { nav } from '../content'
 import { Logo } from './shared/Logo'
 import { Button } from './shared/Button'
 import { useDemoModal } from '../hooks/useDemoModal'
+import { useThemeContext } from '../hooks/useThemeContext'
+import { useAuth } from '../auth/useAuth'
 
-export function Navbar({ theme }) {
+export function Navbar({ solid: alwaysSolid = false }) {
+  const theme = useThemeContext()
+  const { user } = useAuth()
+  const account = user ? { to: '/account', label: 'Account' } : { to: '/login', label: 'Sign In' }
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const { open: openDemo } = useDemoModal()
@@ -33,7 +39,7 @@ export function Navbar({ theme }) {
     }
   }, [open])
 
-  const solid = scrolled || open
+  const solid = alwaysSolid || scrolled || open
   const linkColor = solid ? 'text-base-content/80 hover:text-base-content' : 'text-white/85 hover:text-white'
 
   const ThemeIcon = theme.mode === 'dark' ? SunIcon : MoonIcon
@@ -45,14 +51,14 @@ export function Navbar({ theme }) {
       }`}
     >
       <nav aria-label="Primary" className="mx-auto flex h-[60px] lg:h-[72px] max-w-[1440px] items-center justify-between px-4 md:px-8">
-        <a href="#top" aria-label="AggregateIQ home" className="rounded">
+        <Link to="/" aria-label="AggregateIQ home" className="rounded">
           <Logo inverse={!solid} />
-        </a>
+        </Link>
 
         <ul className="hidden lg:flex items-center gap-8">
           {nav.links.map((l) => (
             <li key={l.label}>
-              <a href={l.href} className={`font-medium text-[15px] transition-colors ${linkColor}`}>
+              <a href={`/${l.href}`} className={`font-medium text-[15px] transition-colors ${linkColor}`}>
                 {l.label}
               </a>
             </li>
@@ -70,9 +76,9 @@ export function Navbar({ theme }) {
           >
             <ThemeIcon className="h-5 w-5" aria-hidden="true" />
           </button>
-          <a href="#signin" className={`hidden lg:inline font-medium text-[15px] ${linkColor}`}>
-            Sign In
-          </a>
+          <Link to={account.to} className={`hidden lg:inline font-medium text-[15px] ${linkColor}`}>
+            {account.label}
+          </Link>
           <span className="hidden sm:block">
             <Button
               variant={solid ? 'primary' : 'accent'}
@@ -120,7 +126,7 @@ export function Navbar({ theme }) {
               <ul className="flex flex-col">
                 {nav.links.map((l, i) => (
                   <motion.li key={l.label} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 * i }}>
-                    <a href={l.href} onClick={() => setOpen(false)} className="block py-4 text-lg font-medium border-b border-base-300">
+                    <a href={`/${l.href}`} onClick={() => setOpen(false)} className="block py-4 text-lg font-medium border-b border-base-300">
                       {l.label}
                     </a>
                   </motion.li>
@@ -136,8 +142,8 @@ export function Navbar({ theme }) {
                 >
                   Request Demo
                 </Button>
-                <Button as="a" href="#signin" variant="secondary">
-                  Sign In
+                <Button as={Link} to={account.to} variant="secondary" onClick={() => setOpen(false)}>
+                  {account.label}
                 </Button>
               </div>
             </motion.div>
