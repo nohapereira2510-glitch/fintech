@@ -1,24 +1,31 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
 import { DemoModalContext } from './hooks/useDemoModal'
 import { useTheme } from './hooks/useTheme'
+import { ThemeContext } from './hooks/useThemeContext'
 import { trackScrollDepth } from './lib/analytics'
-import { Navbar } from './components/Navbar'
-import { Hero } from './components/Hero'
-import { Problem } from './components/Problem'
-import { Solution } from './components/Solution'
-import { Features } from './components/Features'
-import { SocialProof } from './components/SocialProof'
-import { Pricing } from './components/Pricing'
-import { IntegrationsSecurity } from './components/IntegrationsSecurity'
-import { DemoVideo } from './components/DemoVideo'
-import { FinalCTA } from './components/FinalCTA'
-import { Footer } from './components/Footer'
+import { AuthProvider } from './auth/AuthProvider'
+import { RequireAuth } from './auth/RequireAuth'
 import { DemoRequestModal } from './components/DemoRequestModal'
 import { ExitIntent } from './components/ExitIntent'
+import { FullPageSpinner } from './components/shared/FullPageSpinner'
+import Home from './pages/Home'
 
-// Heaviest interactive component: split into its own chunk.
-const ROICalculator = lazy(() => import('./components/ROICalculator').then((m) => ({ default: m.ROICalculator })))
+const Login = lazy(() => import('./pages/Login'))
+const SignUp = lazy(() => import('./pages/SignUp'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const Account = lazy(() => import('./pages/Account'))
+const NotFound = lazy(() => import('./pages/NotFound'))
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (!hash) window.scrollTo(0, 0)
+  }, [pathname, hash])
+  return null
+}
 
 export default function App() {
   const theme = useTheme()
@@ -34,30 +41,39 @@ export default function App() {
   useEffect(() => trackScrollDepth(), [])
 
   return (
-    <MotionConfig reducedMotion="user">
-      <DemoModalContext.Provider value={modal}>
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[1100] focus:rounded-lg focus:bg-base-100 focus:px-4 focus:py-3 focus:shadow-lg">
-          Skip to content
-        </a>
-        <Navbar theme={theme} />
-        <main id="main">
-          <Hero />
-          <Problem />
-          <Solution />
-          <Features />
-          <Suspense fallback={<div className="section-pad" aria-busy="true" />}>
-            <ROICalculator />
-          </Suspense>
-          <SocialProof />
-          <Pricing />
-          <IntegrationsSecurity />
-          <DemoVideo />
-          <FinalCTA />
-        </main>
-        <Footer />
-        <DemoRequestModal request={request} onClose={() => setRequest(null)} />
-        <ExitIntent suppressed={hasRequested} />
-      </DemoModalContext.Provider>
-    </MotionConfig>
+    <BrowserRouter>
+      <AuthProvider>
+        <ThemeContext.Provider value={theme}>
+          <MotionConfig reducedMotion="user">
+            <DemoModalContext.Provider value={modal}>
+              <ScrollToTop />
+              <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[1100] focus:rounded-lg focus:bg-base-100 focus:px-4 focus:py-3 focus:shadow-lg">
+                Skip to content
+              </a>
+              <Suspense fallback={<FullPageSpinner />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route
+                    path="/account"
+                    element={
+                      <RequireAuth>
+                        <Account />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+              <DemoRequestModal request={request} onClose={() => setRequest(null)} />
+              <ExitIntent suppressed={hasRequested} />
+            </DemoModalContext.Provider>
+          </MotionConfig>
+        </ThemeContext.Provider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }

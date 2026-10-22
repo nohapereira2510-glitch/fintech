@@ -2,7 +2,9 @@
 
 B2B landing page for the AggregateIQ Growth Platform, built from the landing-page PRD and the brand system in [`../docs/brand-design-system.md`](../docs/brand-design-system.md).
 
-**Stack:** React 19, Vite, Tailwind CSS v4, DaisyUI 5 (light/dark themes), Framer Motion, Heroicons.
+**Stack:** React 19, Vite, React Router, Tailwind CSS v4, DaisyUI 5 (light/dark themes), Framer Motion, Heroicons, Supabase Auth.
+
+Email login (sign up, sign in, email link, password reset, account page) is documented in [`../docs/auth-setup.md`](../docs/auth-setup.md), including the dashboard settings it needs.
 
 ## Run
 
@@ -10,7 +12,7 @@ B2B landing page for the AggregateIQ Growth Platform, built from the landing-pag
 npm install
 npm run dev      # local dev server
 npm run build    # production build in dist/
-npm test         # ROI calculator unit tests
+npm test         # ROI calculator and auth helper unit tests
 ```
 
 Copy `.env.example` to `.env` to configure:
@@ -18,6 +20,7 @@ Copy `.env.example` to `.env` to configure:
 | Variable | Purpose |
 |---|---|
 | `VITE_GA_ID` | GA4 measurement ID. Analytics events are no-ops without it. |
+| `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase project for email login (already set in `netlify.toml` and `.env.example`). |
 | `VITE_LEAD_ENDPOINT` | URL that receives demo requests and newsletter signups as JSON (CRM webhook). Without it, submissions are simulated. |
 
 ## Structure
